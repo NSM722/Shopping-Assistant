@@ -21,21 +21,19 @@ class _NewItemState extends State<NewItem> {
         padding: const EdgeInsets.all(12),
         child: Form(
           child: Column(children: [
-            Expanded(
-              child: TextFormField(
-                validator: (value) {
-                  // return this error message is form validation fails
-                  return 'Demo Text....';
-                },
-                maxLength: 50,
-                decoration: const InputDecoration(
-                  label: Text(
-                    'Name',
-                  ),
+            TextFormField(
+              validator: (value) {
+                // return this error message is form validation fails
+                return 'Demo Text....';
+              },
+              maxLength: 50,
+              decoration: const InputDecoration(
+                label: Text(
+                  'Name',
                 ),
               ),
             ),
-            Row(children: [
+            Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
               // MUST BE WRAPPED WITH EXPANDED WIDGET TO AVOID A HORIZONTAL CONSTRAINT RENDERING ERROR
               Expanded(
                 child: TextFormField(
