@@ -50,6 +50,16 @@ class _NewItemState extends State<NewItem> {
                     ),
                   ),
                   initialValue: '1', // set as a string not a number
+                  validator: (value) {
+                    if (value == null ||
+                        value.isEmpty ||
+                        int.tryParse(value) == null ||
+                        int.tryParse(value)! <= 0) {
+                      // return this error message is form validation fails
+                      return 'Must be a valid number';
+                    }
+                    return null;
+                  },
                 ),
               ),
               const SizedBox(
