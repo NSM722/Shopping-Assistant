@@ -74,7 +74,15 @@ class _NewItemState extends State<NewItem> {
                   onChanged: (value) {},
                 ),
               )
-            ])
+            ]),
+            Row(
+              children: [
+                TextButton(
+                  onPressed: onPressed,
+                  child: child,
+                )
+              ],
+            ),
           ]),
         ),
       ),
