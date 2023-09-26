@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shopping_list/data/categories.dart';
+import 'package:shopping_list/models/category.dart';
 
 class NewItem extends StatefulWidget {
   const NewItem({super.key});
@@ -9,6 +10,25 @@ class NewItem extends StatefulWidget {
 }
 
 class _NewItemState extends State<NewItem> {
+  // gives access to form widgets it's connected to
+  final _formKey = GlobalKey<FormState>();
+  var _enteredName = '';
+  var _enteredQuantity = 1;
+  var _selectedCategory = categories[Categories.meat]; // default value
+
+  // trigger validation
+  void _saveItem() {
+    // executes form validator functions
+    if (_formKey.currentState!.validate()) {
+      // Saves every [FormField] that is a descendant of this [Form] and executes the onSaved function
+      _formKey.currentState!.save();
+    }
+
+    print(_enteredName);
+    print(_enteredQuantity);
+    print(_selectedCategory);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -20,13 +40,25 @@ class _NewItemState extends State<NewItem> {
       body: Padding(
         padding: const EdgeInsets.all(12),
         child: Form(
+          // ensure flutter validates this form and triggers all the validator functions
+          key: _formKey,
           child: Column(children: [
             TextFormField(
               validator: (value) {
-                // return this error message is form validation fails
-                return 'Demo Text....';
+                if (value == null ||
+                    value.isEmpty ||
+                    value.trim().length <= 1 ||
+                    value.trim().length > 50) {
+                  // return this error message is form validation fails
+                  return 'Must be between 2 and 50 characters long';
+                }
+                return null;
               },
-              maxLength: 50,
+              onSaved: (newValue) {
+                _enteredName = newValue!;
+              },
+              maxLength:
+                  50, // & minimum of 2 chars according to the above condition
               decoration: const InputDecoration(
                 label: Text(
                   'Name',
@@ -37,12 +69,26 @@ class _NewItemState extends State<NewItem> {
               // MUST BE WRAPPED WITH EXPANDED WIDGET TO AVOID A HORIZONTAL CONSTRAINT RENDERING ERROR
               Expanded(
                 child: TextFormField(
+                  keyboardType: TextInputType.number,
                   decoration: const InputDecoration(
                     label: Text(
                       'Quantity',
                     ),
                   ),
-                  initialValue: '1', // set as a string not a number
+                  initialValue: _enteredQuantity.toString(),
+                  validator: (value) {
+                    if (value == null ||
+                        value.isEmpty ||
+                        int.tryParse(value) == null ||
+                        int.tryParse(value)! <= 0) {
+                      // return this error message is form validation fails
+                      return 'Must be a valid number';
+                    }
+                    return null;
+                  },
+                  onSaved: (newValue) {
+                    _enteredQuantity = int.parse(newValue!);
+                  },
                 ),
               ),
               const SizedBox(
@@ -51,6 +97,7 @@ class _NewItemState extends State<NewItem> {
               // MUST BE WRAPPED WITH EXPANDED WIDGET TO AVOID A HORIZONTAL CONSTRAINT RENDERING ERROR
               Expanded(
                 child: DropdownButtonFormField(
+                  value: _selectedCategory,
                   items: [
                     for (final category in categories.entries)
                       // convert Map to list
@@ -71,7 +118,12 @@ class _NewItemState extends State<NewItem> {
                         ]),
                       )
                   ],
-                  onChanged: (value) {},
+                  // triggered when a new selection occurs
+                  onChanged: (value) {
+                    setState(() {
+                      _selectedCategory = value!;
+                    });
+                  },
                 ),
               )
             ]),
@@ -80,7 +132,9 @@ class _NewItemState extends State<NewItem> {
             ),
             Row(mainAxisAlignment: MainAxisAlignment.start, children: [
               TextButton(
-                onPressed: () {},
+                onPressed: () {
+                  _formKey.currentState!.reset();
+                },
                 child: const Text(
                   'Reset',
                 ),
@@ -91,7 +145,7 @@ class _NewItemState extends State<NewItem> {
                 ),
               ),
               ElevatedButton(
-                onPressed: () {},
+                onPressed: _saveItem,
                 child: const Text(
                   'Add Item',
                 ),
