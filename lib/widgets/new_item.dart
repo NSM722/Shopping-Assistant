@@ -16,10 +16,23 @@ class _NewItemState extends State<NewItem> {
           'Add a new item',
         ),
       ),
-      body: const Padding(
-        padding: EdgeInsets.all(12),
-        child: Text(
-          'This will be the form',
+      body: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Form(
+          child: Column(children: [
+            TextFormField(
+              validator: (value) {
+                // return this error message is form validation fails
+                return 'Demo Text....';
+              },
+              maxLength: 50,
+              decoration: const InputDecoration(
+                label: Text(
+                  'Name',
+                ),
+              ),
+            ),
+          ]),
         ),
       ),
     );
