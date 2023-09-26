@@ -54,6 +54,7 @@ class _NewItemState extends State<NewItem> {
               // MUST BE WRAPPED WITH EXPANDED WIDGET TO AVOID A HORIZONTAL CONSTRAINT RENDERING ERROR
               Expanded(
                 child: TextFormField(
+                  keyboardType: TextInputType.number,
                   decoration: const InputDecoration(
                     label: Text(
                       'Quantity',
