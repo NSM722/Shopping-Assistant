@@ -23,10 +23,17 @@ class _NewItemState extends State<NewItem> {
           child: Column(children: [
             TextFormField(
               validator: (value) {
-                // return this error message is form validation fails
-                return 'Demo Text....';
+                if (value == null ||
+                    value.isEmpty ||
+                    value.trim().length <= 1 ||
+                    value.trim().length > 50) {
+                  // return this error message is form validation fails
+                  return 'Must be between 2 and 50 characters long';
+                }
+                return null;
               },
-              maxLength: 50,
+              maxLength:
+                  50, // & minimum of 2 chars according to the above condition
               decoration: const InputDecoration(
                 label: Text(
                   'Name',
