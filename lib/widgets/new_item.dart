@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shopping_list/data/categories.dart';
+import 'package:shopping_list/models/category.dart';
 
 class NewItem extends StatefulWidget {
   const NewItem({super.key});
@@ -11,10 +12,21 @@ class NewItem extends StatefulWidget {
 class _NewItemState extends State<NewItem> {
   // gives access to form widgets it's connected to
   final _formKey = GlobalKey<FormState>();
+  var _enteredName = '';
+  var _enteredQuantity = 1;
+  var _selectedCategory = categories[Categories.meat]; // default value
 
   // trigger validation
   void _saveItem() {
-    _formKey.currentState!.validate(); // executes form validator functions
+    // executes form validator functions
+    if (_formKey.currentState!.validate()) {
+      // Saves every [FormField] that is a descendant of this [Form] and executes the onSaved function
+      _formKey.currentState!.save();
+    }
+
+    print(_enteredName);
+    print(_enteredQuantity);
+    print(_selectedCategory);
   }
 
   @override
@@ -42,6 +54,9 @@ class _NewItemState extends State<NewItem> {
                 }
                 return null;
               },
+              onSaved: (newValue) {
+                _enteredName = newValue!;
+              },
               maxLength:
                   50, // & minimum of 2 chars according to the above condition
               decoration: const InputDecoration(
@@ -60,7 +75,7 @@ class _NewItemState extends State<NewItem> {
                       'Quantity',
                     ),
                   ),
-                  initialValue: '1', // set as a string not a number
+                  initialValue: _enteredQuantity.toString(),
                   validator: (value) {
                     if (value == null ||
                         value.isEmpty ||
@@ -71,6 +86,9 @@ class _NewItemState extends State<NewItem> {
                     }
                     return null;
                   },
+                  onSaved: (newValue) {
+                    _enteredQuantity = int.parse(newValue!);
+                  },
                 ),
               ),
               const SizedBox(
@@ -79,6 +97,7 @@ class _NewItemState extends State<NewItem> {
               // MUST BE WRAPPED WITH EXPANDED WIDGET TO AVOID A HORIZONTAL CONSTRAINT RENDERING ERROR
               Expanded(
                 child: DropdownButtonFormField(
+                  value: _selectedCategory,
                   items: [
                     for (final category in categories.entries)
                       // convert Map to list
@@ -99,7 +118,12 @@ class _NewItemState extends State<NewItem> {
                         ]),
                       )
                   ],
-                  onChanged: (value) {},
+                  // triggered when a new selection occurs
+                  onChanged: (value) {
+                    setState(() {
+                      _selectedCategory = value!;
+                    });
+                  },
                 ),
               )
             ]),
