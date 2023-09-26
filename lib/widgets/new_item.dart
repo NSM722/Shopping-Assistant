@@ -9,6 +9,14 @@ class NewItem extends StatefulWidget {
 }
 
 class _NewItemState extends State<NewItem> {
+  // gives access to form widgets it's connected to
+  final _formKey = GlobalKey<FormState>();
+
+  // trigger validation
+  void _saveItem() {
+    _formKey.currentState!.validate(); // executes form validator functions
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -20,6 +28,8 @@ class _NewItemState extends State<NewItem> {
       body: Padding(
         padding: const EdgeInsets.all(12),
         child: Form(
+          // ensure flutter validates this form and triggers all the validator functions
+          key: _formKey,
           child: Column(children: [
             TextFormField(
               validator: (value) {
@@ -108,7 +118,7 @@ class _NewItemState extends State<NewItem> {
                 ),
               ),
               ElevatedButton(
-                onPressed: () {},
+                onPressed: _saveItem,
                 child: const Text(
                   'Add Item',
                 ),
