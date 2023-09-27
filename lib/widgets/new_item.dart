@@ -20,7 +20,7 @@ class _NewItemState extends State<NewItem> {
   void _saveItem() {
     // executes form validator functions
     if (_formKey.currentState!.validate()) {
-      // Saves every [FormField] that is a descendant of this [Form] and executes the onSaved function
+      // Saves every [FormField] that is a descendant of this [Form] and executes the onSaved function in each form widget
       _formKey.currentState!.save();
     }
 
@@ -54,6 +54,7 @@ class _NewItemState extends State<NewItem> {
                 }
                 return null;
               },
+              // function triggered by calling the .save() at the top
               onSaved: (newValue) {
                 _enteredName = newValue!;
               },
@@ -79,7 +80,8 @@ class _NewItemState extends State<NewItem> {
                   validator: (value) {
                     if (value == null ||
                         value.isEmpty ||
-                        int.tryParse(value) == null ||
+                        int.tryParse(value) ==
+                            null || // .tryParse() yields null if value can't be converted to a number
                         int.tryParse(value)! <= 0) {
                       // return this error message is form validation fails
                       return 'Must be a valid number';
@@ -87,7 +89,8 @@ class _NewItemState extends State<NewItem> {
                     return null;
                   },
                   onSaved: (newValue) {
-                    _enteredQuantity = int.parse(newValue!);
+                    _enteredQuantity = int.parse(
+                        newValue!); // .parse() throws an error if value can't be converted to a number
                   },
                 ),
               ),
@@ -97,7 +100,7 @@ class _NewItemState extends State<NewItem> {
               // MUST BE WRAPPED WITH EXPANDED WIDGET TO AVOID A HORIZONTAL CONSTRAINT RENDERING ERROR
               Expanded(
                 child: DropdownButtonFormField(
-                  value: _selectedCategory,
+                  value: _selectedCategory, // updated when selection changes
                   items: [
                     for (final category in categories.entries)
                       // convert Map to list
@@ -145,7 +148,7 @@ class _NewItemState extends State<NewItem> {
                 ),
               ),
               ElevatedButton(
-                onPressed: _saveItem,
+                onPressed: _saveItem, // validation triggered on this button
                 child: const Text(
                   'Add Item',
                 ),
