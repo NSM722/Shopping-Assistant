@@ -2,7 +2,6 @@ import 'dart:convert'; // gives access to json methods
 import 'package:flutter/material.dart';
 import 'package:shopping_list/data/categories.dart';
 import 'package:shopping_list/models/category.dart';
-import 'package:shopping_list/models/grocery_item.dart';
 import 'package:http/http.dart' as http;
 
 class NewItem extends StatefulWidget {
@@ -20,7 +19,7 @@ class _NewItemState extends State<NewItem> {
   var _selectedCategory = categories[Categories.meat]!; // default value
 
   // trigger validation
-  void _saveItem() {
+  void _saveItem() async {
     // executes form validator functions
     if (_formKey.currentState!.validate()) {
       // Saves every [FormField] that is a descendant of this [Form] and executes the onSaved function in each form widget
@@ -32,7 +31,7 @@ class _NewItemState extends State<NewItem> {
           'shopping-list.json');
 
       // POST request to store new data
-      http.post(
+      final response = await http.post(
         url,
         headers: {'Content-Type': 'application/json'},
         body: json.encode(
@@ -45,13 +44,11 @@ class _NewItemState extends State<NewItem> {
         ),
       );
 
-      // passing on this data from this screen to the grocery list screen
-      // Navigator.of(context).pop(GroceryItem(
-      //   id: DateTime.now().toString(),
-      //   name: _enteredName,
-      //   quantity: _enteredQuantity,
-      //   category: _selectedCategory,
-      // ));
+      // condition to pop the screen once request is sent + response is received
+      if (!context.mounted) {
+        return;
+      }
+      Navigator.of(context).pop();
     }
   }
 
