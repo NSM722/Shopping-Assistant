@@ -15,6 +15,7 @@ class GroceryList extends StatefulWidget {
 class _GroceryListState extends State<GroceryList> {
   List<GroceryItem> _groceryItems = [];
   var _isLoading = true;
+  String? _error = '';
 
   @override
   void initState() {
@@ -26,9 +27,15 @@ class _GroceryListState extends State<GroceryList> {
   // FETCH DATA FROM BE
   void _loadItems() async {
     final url = Uri.https(
-        'flutter-http-requests-ce06f-default-rtdb.firebaseio.com',
+        '123flutter-http-requests-ce06f-default-rtdb.firebaseio.com',
         'shopping-list.json');
     final response = await http.get(url);
+
+    if (response.statusCode >= 400) {
+      setState(() {
+        _error = 'Unable to complete your request, please try again.';
+      });
+    }
 
     // output of data received from the BE to understand the way it has been typed
     /// {"-NfL7T2bIn80QIPeNsq_":{"category":"Hygiene","name":"Tampons","quantity":2},"-NfLG1XahanrxthIdg1P":{"category":"Other","name":"Tanqueray","quantity":3}}
@@ -138,6 +145,17 @@ class _GroceryListState extends State<GroceryList> {
               ),
             );
           });
+    }
+
+    if (_error != null) {
+      screenContent = Center(
+        child: Text(
+          _error!,
+          style: const TextStyle(
+            color: Colors.redAccent,
+          ),
+        ),
+      );
     }
 
     return Scaffold(
