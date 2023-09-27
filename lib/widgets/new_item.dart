@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shopping_list/data/categories.dart';
 import 'package:shopping_list/models/category.dart';
+import 'package:shopping_list/models/grocery_item.dart';
 
 class NewItem extends StatefulWidget {
   const NewItem({super.key});
@@ -14,7 +15,7 @@ class _NewItemState extends State<NewItem> {
   final _formKey = GlobalKey<FormState>();
   var _enteredName = '';
   var _enteredQuantity = 1;
-  var _selectedCategory = categories[Categories.meat]; // default value
+  var _selectedCategory = categories[Categories.meat]!; // default value
 
   // trigger validation
   void _saveItem() {
@@ -22,11 +23,19 @@ class _NewItemState extends State<NewItem> {
     if (_formKey.currentState!.validate()) {
       // Saves every [FormField] that is a descendant of this [Form] and executes the onSaved function in each form widget
       _formKey.currentState!.save();
+
+      // passing on this data from this screen to the grocery list screen
+      Navigator.of(context).pop(GroceryItem(
+        id: DateTime.now().toString(),
+        name: _enteredName,
+        quantity: _enteredQuantity,
+        category: _selectedCategory,
+      ));
     }
 
-    print(_enteredName);
-    print(_enteredQuantity);
-    print(_selectedCategory);
+    // print(_enteredName);
+    // print(_enteredQuantity);
+    // print(_selectedCategory);
   }
 
   @override
