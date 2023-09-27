@@ -19,10 +19,17 @@ class _NewItemState extends State<NewItem> {
   var _enteredQuantity = 1;
   var _selectedCategory = categories[Categories.meat]!; // default value
 
+  // loading effect
+  var _isSendingRequest = false;
+
   // trigger validation
   void _saveItem() async {
     // executes form validator functions
     if (_formKey.currentState!.validate()) {
+      setState(() {
+        _isSendingRequest = true;
+      });
+
       // Saves every [FormField] that is a descendant of this [Form] and executes the onSaved function in each form widget
       _formKey.currentState!.save();
 
@@ -165,9 +172,11 @@ class _NewItemState extends State<NewItem> {
             ),
             Row(mainAxisAlignment: MainAxisAlignment.start, children: [
               TextButton(
-                onPressed: () {
-                  _formKey.currentState!.reset();
-                },
+                onPressed: _isSendingRequest
+                    ? null
+                    : () {
+                        _formKey.currentState!.reset();
+                      },
                 child: const Text(
                   'Reset',
                 ),
@@ -178,7 +187,9 @@ class _NewItemState extends State<NewItem> {
                 ),
               ),
               ElevatedButton(
-                onPressed: _saveItem, // validation triggered on this button
+                onPressed: _isSendingRequest
+                    ? null
+                    : _saveItem, // validation triggered on this button
                 child: const Text(
                   'Add Item',
                 ),
