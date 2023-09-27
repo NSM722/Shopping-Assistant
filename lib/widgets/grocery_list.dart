@@ -37,6 +37,15 @@ class _GroceryListState extends State<GroceryList> {
       });
     }
 
+    // check if the response is equal to 'null' i.e there's no data in BE
+    // then display the necessary screen context
+    if (response.body == 'null') {
+      setState(() {
+        _isLoading = false;
+      });
+      return; // the following code won't execute
+    }
+
     // output of data received from the BE to understand the way it has been typed
     /// {"-NfL7T2bIn80QIPeNsq_":{"category":"Hygiene","name":"Tampons","quantity":2},"-NfLG1XahanrxthIdg1P":{"category":"Other","name":"Tanqueray","quantity":3}}
     final Map<String, dynamic> listData =
@@ -88,17 +97,26 @@ class _GroceryListState extends State<GroceryList> {
   }
 
   // SEND DELETE REQUESTS
-  void _removeItem(GroceryItem item) {
-    final url = Uri.https(
-        'flutter-http-requests-ce06f-default-rtdb.firebaseio.com',
-        'shopping-list/${item.id}.json');
-
-    // ITEM IS DELETED ON THE BACKGROUND WITHOUT WAITING ON THE RESPONSE
-    http.delete(url);
+  void _removeItem(GroceryItem item) async {
+    final itemIndex = _groceryItems.indexOf(item);
 
     setState(() {
       _groceryItems.remove(item);
     });
+
+    final url = Uri.https(
+        'flutter-http-requests-ce06f-default-rtdb.firebaseio.com',
+        'shopping-list/${item.id}.json');
+
+    // undo the deletion process if something went wrong
+    final deleteResponse = await http.delete(url);
+
+    if (deleteResponse.statusCode >= 400) {
+      // add the item back at the specific index
+      setState(() {
+        _groceryItems.insert(itemIndex, item);
+      });
+    }
   }
 
   @override
