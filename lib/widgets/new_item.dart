@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shopping_list/data/categories.dart';
 import 'package:shopping_list/models/category.dart';
+import 'package:shopping_list/models/grocery_item.dart';
 
 class NewItem extends StatefulWidget {
   const NewItem({super.key});
@@ -14,19 +15,27 @@ class _NewItemState extends State<NewItem> {
   final _formKey = GlobalKey<FormState>();
   var _enteredName = '';
   var _enteredQuantity = 1;
-  var _selectedCategory = categories[Categories.meat]; // default value
+  var _selectedCategory = categories[Categories.meat]!; // default value
 
   // trigger validation
   void _saveItem() {
     // executes form validator functions
     if (_formKey.currentState!.validate()) {
-      // Saves every [FormField] that is a descendant of this [Form] and executes the onSaved function
+      // Saves every [FormField] that is a descendant of this [Form] and executes the onSaved function in each form widget
       _formKey.currentState!.save();
+
+      // passing on this data from this screen to the grocery list screen
+      Navigator.of(context).pop(GroceryItem(
+        id: DateTime.now().toString(),
+        name: _enteredName,
+        quantity: _enteredQuantity,
+        category: _selectedCategory,
+      ));
     }
 
-    print(_enteredName);
-    print(_enteredQuantity);
-    print(_selectedCategory);
+    // print(_enteredName);
+    // print(_enteredQuantity);
+    // print(_selectedCategory);
   }
 
   @override
@@ -54,6 +63,7 @@ class _NewItemState extends State<NewItem> {
                 }
                 return null;
               },
+              // function triggered by calling the .save() at the top
               onSaved: (newValue) {
                 _enteredName = newValue!;
               },
@@ -79,7 +89,8 @@ class _NewItemState extends State<NewItem> {
                   validator: (value) {
                     if (value == null ||
                         value.isEmpty ||
-                        int.tryParse(value) == null ||
+                        int.tryParse(value) ==
+                            null || // .tryParse() yields null if value can't be converted to a number
                         int.tryParse(value)! <= 0) {
                       // return this error message is form validation fails
                       return 'Must be a valid number';
@@ -87,7 +98,8 @@ class _NewItemState extends State<NewItem> {
                     return null;
                   },
                   onSaved: (newValue) {
-                    _enteredQuantity = int.parse(newValue!);
+                    _enteredQuantity = int.parse(
+                        newValue!); // .parse() throws an error if value can't be converted to a number
                   },
                 ),
               ),
@@ -97,7 +109,7 @@ class _NewItemState extends State<NewItem> {
               // MUST BE WRAPPED WITH EXPANDED WIDGET TO AVOID A HORIZONTAL CONSTRAINT RENDERING ERROR
               Expanded(
                 child: DropdownButtonFormField(
-                  value: _selectedCategory,
+                  value: _selectedCategory, // updated when selection changes
                   items: [
                     for (final category in categories.entries)
                       // convert Map to list
@@ -145,7 +157,7 @@ class _NewItemState extends State<NewItem> {
                 ),
               ),
               ElevatedButton(
-                onPressed: _saveItem,
+                onPressed: _saveItem, // validation triggered on this button
                 child: const Text(
                   'Add Item',
                 ),
