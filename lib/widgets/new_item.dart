@@ -190,9 +190,16 @@ class _NewItemState extends State<NewItem> {
                 onPressed: _isSendingRequest
                     ? null
                     : _saveItem, // validation triggered on this button
-                child: const Text(
-                  'Add Item',
-                ),
+                child: _isSendingRequest
+                    ? const Text(
+                        'Saving...',
+                        style: TextStyle(
+                          color: Colors.green,
+                        ),
+                      )
+                    : const Text(
+                        'Add Item',
+                      ),
               )
             ]),
           ]),
