@@ -33,14 +33,21 @@ class _GroceryListState extends State<GroceryList> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Your Groceries'), actions: [
-        IconButton(
-          onPressed: _addItem,
-          icon: const Icon(Icons.add),
-        )
-      ]),
-      body: ListView.builder(
+    Widget screenContent = const Padding(
+      padding: EdgeInsets.all(12.0),
+      child: Center(
+        child: Text(
+          'You have no items on your list, add some!',
+          style: TextStyle(
+            wordSpacing: 1.6,
+          ),
+        ),
+      ),
+    );
+
+    // overwrite the content if the list isn't empty
+    if (_groceryItems.isNotEmpty) {
+      screenContent = ListView.builder(
           itemCount: _groceryItems.length, // necessary for optimization
           itemBuilder: (context, index) {
             return ListTile(
@@ -56,7 +63,17 @@ class _GroceryListState extends State<GroceryList> {
                 _groceryItems[index].quantity.toString(), // output the quantity
               ),
             );
-          }),
+          });
+    }
+
+    return Scaffold(
+      appBar: AppBar(title: const Text('Your Groceries'), actions: [
+        IconButton(
+          onPressed: _addItem,
+          icon: const Icon(Icons.add),
+        )
+      ]),
+      body: screenContent,
     );
   }
 }
