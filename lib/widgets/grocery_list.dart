@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:shopping_list/data/categories.dart';
-import 'package:shopping_list/models/category.dart';
 import 'package:shopping_list/models/grocery_item.dart';
 import 'package:shopping_list/widgets/new_item.dart';
 import 'package:http/http.dart' as http;
@@ -15,6 +14,7 @@ class GroceryList extends StatefulWidget {
 
 class _GroceryListState extends State<GroceryList> {
   List<GroceryItem> _groceryItems = [];
+  var _isLoading = true;
 
   @override
   void initState() {
@@ -61,6 +61,7 @@ class _GroceryListState extends State<GroceryList> {
     // re-assign the _groceryItems
     setState(() {
       _groceryItems = loadedItems;
+      _isLoading = false;
     });
   }
 
@@ -98,6 +99,16 @@ class _GroceryListState extends State<GroceryList> {
         ),
       ),
     );
+
+    // check for loading effect
+    if (_isLoading) {
+      screenContent = const Center(
+        child: CircularProgressIndicator(
+          strokeWidth: 7.0,
+          color: Colors.blueAccent,
+        ),
+      );
+    }
 
     // overwrite the content if the list isn't empty
     if (_groceryItems.isNotEmpty) {
