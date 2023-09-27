@@ -27,7 +27,7 @@ class _GroceryListState extends State<GroceryList> {
   // FETCH DATA FROM BE
   void _loadItems() async {
     final url = Uri.https(
-        '123flutter-http-requests-ce06f-default-rtdb.firebaseio.com',
+        'flutter-http-requests-ce06f-default-rtdb.firebaseio.com',
         'shopping-list.json');
     final response = await http.get(url);
 
@@ -87,7 +87,15 @@ class _GroceryListState extends State<GroceryList> {
     });
   }
 
+  // SEND DELETE REQUESTS
   void _removeItem(GroceryItem item) {
+    final url = Uri.https(
+        'flutter-http-requests-ce06f-default-rtdb.firebaseio.com',
+        'shopping-list/${item.id}.json');
+
+    // ITEM IS DELETED ON THE BACKGROUND WITHOUT WAITING ON THE RESPONSE
+    http.delete(url);
+
     setState(() {
       _groceryItems.remove(item);
     });
