@@ -23,7 +23,7 @@ class _GroceryListState extends State<GroceryList> {
     _loadItems();
   }
 
-  // fetch data from BE
+  // FETCH DATA FROM BE
   void _loadItems() async {
     final url = Uri.https(
         'flutter-http-requests-ce06f-default-rtdb.firebaseio.com',
@@ -41,7 +41,7 @@ class _GroceryListState extends State<GroceryList> {
 
     /// convert the map entries to a list of grocery items
     /// this is a temporary list to replace _groceryItems
-    final List<GroceryItem> _loadedItems = [];
+    final List<GroceryItem> loadedItems = [];
 
     for (final item in listData.entries) {
       // get the first matching item
@@ -50,7 +50,7 @@ class _GroceryListState extends State<GroceryList> {
               (element) => element.value.title == item.value['category'])
           .value;
 
-      _loadedItems.add(GroceryItem(
+      loadedItems.add(GroceryItem(
         id: item.key, // the automatically generated key in Firebase
         name: item.value['name'],
         quantity: item.value['quantity'],
@@ -60,16 +60,23 @@ class _GroceryListState extends State<GroceryList> {
 
     // re-assign the _groceryItems
     setState(() {
-      _groceryItems = _loadedItems;
+      _groceryItems = loadedItems;
     });
   }
 
   void _addItem() async {
-    Navigator.of(context).push<GroceryItem>(MaterialPageRoute(
+    final newItem =
+        await Navigator.of(context).push<GroceryItem>(MaterialPageRoute(
       builder: (context) => const NewItem(),
     ));
 
-    _loadItems();
+    if (newItem == null) {
+      return;
+    }
+
+    setState(() {
+      _groceryItems.add(newItem);
+    });
   }
 
   void _removeItem(GroceryItem item) {
