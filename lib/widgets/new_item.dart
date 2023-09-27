@@ -1,3 +1,4 @@
+import 'dart:convert'; // gives access to json methods
 import 'package:flutter/material.dart';
 import 'package:shopping_list/data/categories.dart';
 import 'package:shopping_list/models/category.dart';
@@ -25,13 +26,32 @@ class _NewItemState extends State<NewItem> {
       // Saves every [FormField] that is a descendant of this [Form] and executes the onSaved function in each form widget
       _formKey.currentState!.save();
 
+      // My Firebase BE service
+      final url = Uri.https(
+          'flutter-http-requests-ce06f-default-rtdb.firebaseio.com',
+          'shopping-list.json');
+
+      // POST request to store new data
+      http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(
+          {
+            // id is generated automatically
+            'name': _enteredName,
+            'quantity': _enteredQuantity,
+            'category': _selectedCategory.title,
+          },
+        ),
+      );
+
       // passing on this data from this screen to the grocery list screen
-      Navigator.of(context).pop(GroceryItem(
-        id: DateTime.now().toString(),
-        name: _enteredName,
-        quantity: _enteredQuantity,
-        category: _selectedCategory,
-      ));
+      // Navigator.of(context).pop(GroceryItem(
+      //   id: DateTime.now().toString(),
+      //   name: _enteredName,
+      //   quantity: _enteredQuantity,
+      //   category: _selectedCategory,
+      // ));
     }
   }
 
