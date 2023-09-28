@@ -13,15 +13,15 @@ class GroceryList extends StatefulWidget {
 }
 
 class _GroceryListState extends State<GroceryList> {
-  List<GroceryItem> _groceryItems = [];
-  var _isLoading = true;
-  String? _error = '';
+  final List<GroceryItem> _groceryItems = [];
+  late Future<List<GroceryItem>>
+      _loadedItems; // late --> we will have a value later
 
   @override
   void initState() {
     super.initState();
     // load the items when the app initializes
-    _loadItems();
+    _loadedItems = _loadItems();
   }
 
   // FETCH DATA FROM BE
@@ -35,6 +35,7 @@ class _GroceryListState extends State<GroceryList> {
     final response = await http.get(url);
 
     if (response.statusCode >= 400) {
+      throw Exception('Unable to complete your request, please try again.');
       // setState(() {
       //   _error = 'Unable to complete your request, please try again.';
       // });
@@ -116,69 +117,6 @@ class _GroceryListState extends State<GroceryList> {
 
   @override
   Widget build(BuildContext context) {
-    Widget screenContent = const Padding(
-      padding: EdgeInsets.all(12.0),
-      child: Center(
-        child: Text(
-          'You have no items on your list, add some!',
-          style: TextStyle(
-            wordSpacing: 1.6,
-          ),
-        ),
-      ),
-    );
-
-    // check for loading effect
-    if (_isLoading) {
-      screenContent = const Center(
-        child: CircularProgressIndicator(
-          strokeWidth: 7.0,
-          color: Colors.blueAccent,
-        ),
-      );
-    }
-
-    // overwrite the content if the list isn't empty
-    if (_groceryItems.isNotEmpty) {
-      screenContent = ListView.builder(
-          itemCount: _groceryItems.length, // necessary for optimization
-          itemBuilder: (context, index) {
-            return Dismissible(
-              key: ValueKey(_groceryItems[index].id),
-              onDismissed: (direction) => _removeItem(_groceryItems[index]),
-              background: Container(
-                color: Colors.red[800],
-              ),
-              child: ListTile(
-                title: Text(
-                  _groceryItems[index].name,
-                ),
-                leading: Container(
-                  width: 27,
-                  height: 27,
-                  color: _groceryItems[index].category.color,
-                ),
-                trailing: Text(
-                  _groceryItems[index]
-                      .quantity
-                      .toString(), // output the quantity
-                ),
-              ),
-            );
-          });
-    }
-
-    if (_error != null) {
-      screenContent = Center(
-        child: Text(
-          _error!,
-          style: const TextStyle(
-            color: Colors.redAccent,
-          ),
-        ),
-      );
-    }
-
     return Scaffold(
       appBar: AppBar(title: const Text('Your Groceries'), actions: [
         IconButton(
@@ -187,9 +125,74 @@ class _GroceryListState extends State<GroceryList> {
         )
       ]),
       body: FutureBuilder(
-        future: future,
-        builder: (context, snapshot) {},
-      ),
+          future: _loadedItems,
+          builder: (context, snapshot) {
+            // return a widget based on the current state of the future
+            // evaluate the current state of the future using the snapshot
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              // .waiting is the loading state
+              return const Center(
+                child: CircularProgressIndicator(
+                  strokeWidth: 7.0,
+                  color: Colors.blueAccent,
+                ),
+              );
+            }
+
+            // check for error
+            if (snapshot.hasError) {
+              return Center(
+                child: Text(
+                  snapshot.error.toString(),
+                  style: const TextStyle(
+                    color: Colors.redAccent,
+                  ),
+                ),
+              );
+            }
+
+            if (snapshot.data!.isEmpty) {
+              return const Padding(
+                padding: EdgeInsets.all(12.0),
+                child: Center(
+                  child: Text(
+                    'You have no items on your list, add some!',
+                    style: TextStyle(
+                      wordSpacing: 1.6,
+                    ),
+                  ),
+                ),
+              );
+            }
+
+            // at this point we have the data
+            return ListView.builder(
+                itemCount: snapshot.data!.length,
+                itemBuilder: (context, index) {
+                  return Dismissible(
+                    key: ValueKey(snapshot.data![index].id),
+                    onDismissed: (direction) =>
+                        _removeItem(snapshot.data![index]),
+                    background: Container(
+                      color: Colors.red[800],
+                    ),
+                    child: ListTile(
+                      title: Text(
+                        _groceryItems[index].name,
+                      ),
+                      leading: Container(
+                        width: 27,
+                        height: 27,
+                        color: snapshot.data![index].category.color,
+                      ),
+                      trailing: Text(
+                        snapshot.data![index].quantity
+                            .toString(), // output the quantity
+                      ),
+                    ),
+                  );
+                });
+          }),
     );
   }
 }
