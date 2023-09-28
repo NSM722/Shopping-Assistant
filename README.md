@@ -23,3 +23,5 @@ Import and bundle all the contents of the package to a **http** object
 ```dart
 import 'package:http/http.dart' as http;
 ```
+
+### [FutureBuilder Widget](https://api.flutter.dev/flutter/widgets/FutureBuilder-class.html "read docs")
