@@ -25,7 +25,7 @@ class _GroceryListState extends State<GroceryList> {
   }
 
   // FETCH DATA FROM BE
-  void _loadItems() async {
+  Future<List<GroceryItem>> _loadItems() async {
     final url = Uri.https(
         'flutter-http-requests-ce06f-default-rtdb.firebaseio.com',
         'shopping-list.json');
@@ -77,11 +77,7 @@ class _GroceryListState extends State<GroceryList> {
         ));
       }
 
-      // re-assign the _groceryItems
-      setState(() {
-        _groceryItems = loadedItems;
-        _isLoading = false;
-      });
+      return _loadItems();
     } catch (error) {
       setState(() {
         _error = 'Something went wrong, try again!';
@@ -199,7 +195,10 @@ class _GroceryListState extends State<GroceryList> {
           icon: const Icon(Icons.add),
         )
       ]),
-      body: screenContent,
+      body: FutureBuilder(
+        future: future,
+        builder: (context, snapshot) {},
+      ),
     );
   }
 }
