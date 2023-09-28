@@ -43,9 +43,6 @@ class _GroceryListState extends State<GroceryList> {
     // check if the response is equal to 'null' i.e there's no data in BE
     // then display the necessary screen context
     if (response.body == 'null') {
-      setState(() {
-        _isLoading = false;
-      });
       return [];
     }
 
