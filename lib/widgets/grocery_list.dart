@@ -30,19 +30,13 @@ class _GroceryListState extends State<GroceryList> {
         'flutter-http-requests-ce06f-default-rtdb.firebaseio.com',
         'shopping-list.json');
 
-    // PROPER ERROR HANDLING
-
     final response = await http.get(url);
 
     if (response.statusCode >= 400) {
       throw Exception('Unable to complete your request, please try again.');
-      // setState(() {
-      //   _error = 'Unable to complete your request, please try again.';
-      // });
     }
 
     // check if the response is equal to 'null' i.e there's no data in BE
-    // then display the necessary screen context
     if (response.body == 'null') {
       return [];
     }
@@ -124,10 +118,10 @@ class _GroceryListState extends State<GroceryList> {
           icon: const Icon(Icons.add),
         )
       ]),
+      // return a widget based on the current state of the future
       body: FutureBuilder(
           future: _loadedItems,
           builder: (context, snapshot) {
-            // return a widget based on the current state of the future
             // evaluate the current state of the future using the snapshot
             if (snapshot.connectionState == ConnectionState.waiting) {
               // .waiting is the loading state
