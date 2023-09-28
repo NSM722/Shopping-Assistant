@@ -46,7 +46,7 @@ class _GroceryListState extends State<GroceryList> {
       setState(() {
         _isLoading = false;
       });
-      return; // the following code won't execute
+      return [];
     }
 
     // output of data received from the BE to understand the way it has been typed
