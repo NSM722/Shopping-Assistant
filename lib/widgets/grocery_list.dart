@@ -35,9 +35,9 @@ class _GroceryListState extends State<GroceryList> {
     final response = await http.get(url);
 
     if (response.statusCode >= 400) {
-      setState(() {
-        _error = 'Unable to complete your request, please try again.';
-      });
+      // setState(() {
+      //   _error = 'Unable to complete your request, please try again.';
+      // });
     }
 
     // check if the response is equal to 'null' i.e there's no data in BE
