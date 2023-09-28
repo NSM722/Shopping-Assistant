@@ -31,58 +31,52 @@ class _GroceryListState extends State<GroceryList> {
         'shopping-list.json');
 
     // PROPER ERROR HANDLING
-    try {
-      final response = await http.get(url);
 
-      if (response.statusCode >= 400) {
-        setState(() {
-          _error = 'Unable to complete your request, please try again.';
-        });
-      }
+    final response = await http.get(url);
 
-      // check if the response is equal to 'null' i.e there's no data in BE
-      // then display the necessary screen context
-      if (response.body == 'null') {
-        setState(() {
-          _isLoading = false;
-        });
-        return; // the following code won't execute
-      }
-
-      // output of data received from the BE to understand the way it has been typed
-      /// {"-NfL7T2bIn80QIPeNsq_":{"category":"Hygiene","name":"Tampons","quantity":2},"-NfLG1XahanrxthIdg1P":{"category":"Other","name":"Tanqueray","quantity":3}}
-      final Map<String, dynamic> listData =
-          json.decode(response.body); // convert json to Map
-
-      // format to list
-      // the output of listData.entries
-      /// [MapEntry("-NfL7T2bIn80QIPeNsq_", {category: Hygiene, name: Tampons, quantity: 2}), MapEntry("-NfLG1XahanrxthIdg1P", {category: Other, name: Tanqueray, quantity: 3})]
-
-      /// convert the map entries to a list of grocery items
-      /// this is a temporary list to replace _groceryItems
-      final List<GroceryItem> loadedItems = [];
-
-      for (final item in listData.entries) {
-        // get the first matching item
-        final category = categories.entries
-            .firstWhere(
-                (element) => element.value.title == item.value['category'])
-            .value;
-
-        loadedItems.add(GroceryItem(
-          id: item.key, // the automatically generated key in Firebase
-          name: item.value['name'],
-          quantity: item.value['quantity'],
-          category: category,
-        ));
-      }
-
-      return _loadItems();
-    } catch (error) {
+    if (response.statusCode >= 400) {
       setState(() {
-        _error = 'Something went wrong, try again!';
+        _error = 'Unable to complete your request, please try again.';
       });
     }
+
+    // check if the response is equal to 'null' i.e there's no data in BE
+    // then display the necessary screen context
+    if (response.body == 'null') {
+      setState(() {
+        _isLoading = false;
+      });
+      return; // the following code won't execute
+    }
+
+    // output of data received from the BE to understand the way it has been typed
+    /// {"-NfL7T2bIn80QIPeNsq_":{"category":"Hygiene","name":"Tampons","quantity":2},"-NfLG1XahanrxthIdg1P":{"category":"Other","name":"Tanqueray","quantity":3}}
+    final Map<String, dynamic> listData =
+        json.decode(response.body); // convert json to Map
+
+    // format to list
+    // the output of listData.entries
+    /// [MapEntry("-NfL7T2bIn80QIPeNsq_", {category: Hygiene, name: Tampons, quantity: 2}), MapEntry("-NfLG1XahanrxthIdg1P", {category: Other, name: Tanqueray, quantity: 3})]
+
+    /// convert the map entries to a list of grocery items
+    /// this is a temporary list to replace _groceryItems
+    final List<GroceryItem> loadedItems = [];
+
+    for (final item in listData.entries) {
+      // get the first matching item
+      final category = categories.entries
+          .firstWhere(
+              (element) => element.value.title == item.value['category'])
+          .value;
+
+      loadedItems.add(GroceryItem(
+        id: item.key, // the automatically generated key in Firebase
+        name: item.value['name'],
+        quantity: item.value['quantity'],
+        category: category,
+      ));
+    }
+    return _loadItems();
   }
 
   void _addItem() async {
